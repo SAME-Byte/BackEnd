@@ -1,3 +1,15 @@
+-- =========================================================
+-- Esquema de la base de datos engine_db
+-- Se puede ejecutar varias veces: primero borra las tablas
+-- (en orden inverso a sus dependencias) y luego las crea.
+-- =========================================================
+
+DROP TABLE IF EXISTS Parte_Compatible CASCADE;
+DROP TABLE IF EXISTS Piezas           CASCADE;
+DROP TABLE IF EXISTS Marcas           CASCADE;
+DROP TABLE IF EXISTS Categorias       CASCADE;
+DROP TABLE IF EXISTS Usuarios         CASCADE;
+
 
 CREATE TABLE Usuarios (
   id            SERIAL        PRIMARY KEY,
