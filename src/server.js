@@ -8,6 +8,11 @@ if (!process.env.JWT_SECRET) {
   process.exit(1)
 }
 
+if (!process.env.ENIGMA_CLAVE || process.env.ENIGMA_CLAVE.length < 16) {
+  console.error('Falta ENIGMA_CLAVE en el archivo .env (mínimo 16 caracteres)')
+  process.exit(1)
+}
+
 const PORT = Number(process.env.PORT) || 3000
 
 // Probar la conexión a la base antes de aceptar peticiones

@@ -3,8 +3,15 @@
 import 'dotenv/config'
 import { readFile } from 'node:fs/promises'
 import pg from 'pg'
+import { hashearContrasena } from '../src/utils/contrasenas.js'
 
 const archivos = ['schema.sql', 'seed.sql']
+
+// Contraseñas de los admins del seed (se cifran con la Enigma de ENIGMA_CLAVE + bcrypt)
+const admins = [
+  { email: 'admin@refaccionaria.com', contrasena: 'Admin123!' },
+  { email: 'soporte@refaccionaria.com', contrasena: 'Soporte123!' },
+]
 
 const cliente = new pg.Client({
   host: process.env.DB_HOST,
@@ -23,6 +30,12 @@ try {
     await cliente.query(sql)
     console.log(`  ✔ ${nombre} ejecutado`)
   }
+
+  for (const { email, contrasena } of admins) {
+    const hash = await hashearContrasena(contrasena)
+    await cliente.query('UPDATE Usuarios SET Contrasena = $1 WHERE LOWER(Email) = $2', [hash, email])
+  }
+  console.log('  ✔ contraseñas de administradores cifradas')
 
   console.log('Base de datos lista.')
 } catch (error) {

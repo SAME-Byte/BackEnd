@@ -4,12 +4,13 @@
 -- =========================================================
 
 -- Usuarios administradores (deben ir PRIMERO: las piezas usan created_by = 1)
--- Las contraseñas están cifradas con bcrypt (10 rondas). En texto plano son:
+-- La contraseña se guarda como bcrypt(Enigma(contraseña)) y la Enigma depende de
+-- ENIGMA_CLAVE, así que aquí va un marcador y db/setup.js pone el hash real:
 --   admin@refaccionaria.com   -> Admin123!
 --   soporte@refaccionaria.com -> Soporte123!
 INSERT INTO Usuarios (name, Email, Contrasena, role) VALUES
- ('Administrador', 'admin@refaccionaria.com',   '$2a$10$Kapj5wzgvnrCGCWqjq9atO8ik5Z/HZ7qLR.7xWEP9e7MNsgYk3Xmy', 'admin'),
- ('Soporte',       'soporte@refaccionaria.com', '$2a$10$w4sNwxM461ar9AV.TecVkuMy.hASatVu40rG2Si4/VYKd8JXQ6tua', 'admin');
+ ('Administrador', 'admin@refaccionaria.com',   'PENDIENTE', 'admin'),
+ ('Soporte',       'soporte@refaccionaria.com', 'PENDIENTE', 'admin');
 
 INSERT INTO Categorias (name, description) VALUES
  ('Supercargadores', 'Compresores mecánicos para más potencia'),

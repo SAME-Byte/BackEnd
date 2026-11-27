@@ -1,6 +1,7 @@
-import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { pool } from '../config/db.js'
+import { hashearContrasena, compararContrasena } from '../utils/contrasenas.js'
+import { validarContrasena } from '../utils/validadorContrasena.js'
 
 // Datos públicos del usuario (nunca se manda la contraseña)
 const aUsuario = (fila) => ({ id: fila.id, nombre: fila.name, email: fila.email, rol: fila.role })
@@ -17,7 +18,7 @@ export async function login(req, res) {
 
   // Mismo mensaje si no existe el correo o si la contraseña no coincide:
   // así no se revela qué correos están registrados
-  const valida = fila && (await bcrypt.compare(contrasena, fila.contrasena))
+  const valida = fila && (await compararContrasena(contrasena, fila.contrasena))
   if (!valida) {
     return res.status(401).json({ error: 'Correo o contraseña incorrectos.' })
   }
@@ -44,7 +45,7 @@ export async function registro(req, res) {
     return res.status(409).json({ error: 'Ya existe una cuenta con ese correo.' })
   }
 
-  const hash = await bcrypt.hash(contrasena, 10)
+  const hash = await hashearContrasena(contrasena)
   const { rows } = await pool.query(
     `INSERT INTO Usuarios (name, email, contrasena, role)
      VALUES ($1, $2, $3, 'user')
@@ -61,4 +62,12 @@ export async function perfil(req, res) {
   const { rows } = await pool.query('SELECT id, name, email, role FROM Usuarios WHERE id = $1', [req.usuario.id])
   if (!rows[0]) return res.status(401).json({ error: 'Sesión no válida.' })
   res.json({ usuario: aUsuario(rows[0]) })
+}
+
+// POST /api/auth/validar-contrasena  { contrasena, nombre?, email? }
+//   ->  { valida, errores: [{ regla, mensaje }], entropia, nivel }
+// No guarda nada; sirve para mostrar la fortaleza en el formulario de registro
+export function revisarContrasena(req, res) {
+  const { contrasena, nombre, email } = req.body
+  res.json(validarContrasena(contrasena, { nombre, email }))
 }
